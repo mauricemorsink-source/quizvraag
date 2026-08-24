@@ -37,7 +37,7 @@ export default function QuestionList({ questions, categories, onUpdate, onDelete
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
-          className="rounded-md border border-neutral-300 px-2.5 py-1.5 text-sm"
+          className="rounded-md border border-neutral-300 px-2.5 py-2 text-sm"
         >
           <option value="all">Alle categorieën</option>
           {categories.map((c) => (
@@ -50,7 +50,7 @@ export default function QuestionList({ questions, categories, onUpdate, onDelete
         <select
           value={usedFilter}
           onChange={(e) => setUsedFilter(e.target.value as UsedFilter)}
-          className="rounded-md border border-neutral-300 px-2.5 py-1.5 text-sm"
+          className="rounded-md border border-neutral-300 px-2.5 py-2 text-sm"
         >
           <option value="all">Alles</option>
           <option value="unused">Nog niet gebruikt</option>
@@ -62,7 +62,7 @@ export default function QuestionList({ questions, categories, onUpdate, onDelete
           placeholder="Zoeken…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="min-w-[10rem] flex-1 rounded-md border border-neutral-300 px-2.5 py-1.5 text-sm"
+          className="min-w-[10rem] flex-1 rounded-md border border-neutral-300 px-2.5 py-2 text-sm"
         />
       </div>
 

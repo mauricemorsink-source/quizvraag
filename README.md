@@ -1,8 +1,8 @@
 # Quizvraag
 
-Persoonlijke vragenbank voor pubquizzen: vragen toevoegen, bewerken, filteren op categorie en markeren als gebruikt. Achter een gedeeld wachtwoord.
+Persoonlijke vragenbank voor pubquizzen: vragen en losse kladjes bijhouden, filteren op categorie en markeren als gebruikt.
 
-Stack: Next.js (App Router) + Prisma + Neon (serverless Postgres) + Tailwind, gedeployed op Vercel — zelfde opzet als het ProfCoach-project.
+Stack: Next.js (App Router) + Prisma + Neon (serverless Postgres) + Tailwind, gedeployed op Vercel — zelfde opzet als het ProfCoach-project. Geen inlog nodig; dit is een persoonlijk hulpmiddel zonder gevoelige data.
 
 ## Lokaal draaien
 
@@ -10,8 +10,6 @@ Stack: Next.js (App Router) + Prisma + Neon (serverless Postgres) + Tailwind, ge
 2. Vul `.env` in:
    ```
    DATABASE_URL="postgresql://...neon.tech/..."
-   APP_PASSWORD="kies-hier-je-eigen-wachtwoord"
-   AUTH_SECRET="<al ingevuld met een gegenereerde waarde>"
    ```
 3. Schema naar de database pushen:
    ```
@@ -21,15 +19,16 @@ Stack: Next.js (App Router) + Prisma + Neon (serverless Postgres) + Tailwind, ge
    ```
    npm run dev
    ```
-5. Open [http://localhost:3000](http://localhost:3000) — je wordt naar `/login` gestuurd, log in met `APP_PASSWORD`.
+5. Open [http://localhost:3000](http://localhost:3000).
 
 ## Deployen naar Vercel
 
 1. Nieuwe GitHub-repo aanmaken en pushen.
 2. In Vercel: **Add New → Project** → importeer de repo.
-3. Environment variables instellen in Vercel (Settings → Environment Variables): `DATABASE_URL`, `APP_PASSWORD`, `AUTH_SECRET` (gebruik hiervoor een andere, eigen gegenereerde `AUTH_SECRET` dan lokaal).
+3. Environment variable instellen in Vercel (Settings → Environment Variables): `DATABASE_URL`.
 4. Deploy.
 
 ## Datamodel
 
-Eén `Question`-model (`prisma/schema.prisma`): `question`, `answer`, `category`, optioneel `notes`, en `used`/`usedAt` om bij te houden welke vragen al eens gebruikt zijn.
+- `Question` (`prisma/schema.prisma`): `question`, `answer`, `category`, optioneel `notes`, en `used`/`usedAt` om bij te houden welke vragen al eens gebruikt zijn.
+- `Draft`: losse notitie (`text` + `category`) vanuit het Kladblok-tabblad, om te zetten tot een volwaardige `Question`.

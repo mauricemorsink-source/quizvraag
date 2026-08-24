@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/prisma";
 import AppTabs from "@/components/AppTabs";
-import LogoutButton from "@/components/LogoutButton";
 
 export const dynamic = "force-dynamic";
 
@@ -11,13 +10,10 @@ export default async function Home() {
   ]);
 
   return (
-    <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-8">
-      <header className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-neutral-900">Quizvraag</h1>
-          <p className="text-sm text-neutral-500">Je persoonlijke vragenbank voor pubquizzen.</p>
-        </div>
-        <LogoutButton />
+    <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-6 sm:py-8">
+      <header className="mb-6">
+        <h1 className="text-2xl font-semibold text-neutral-900">Quizvraag</h1>
+        <p className="text-sm text-neutral-500">Je persoonlijke vragenbank voor pubquizzen.</p>
       </header>
 
       <AppTabs

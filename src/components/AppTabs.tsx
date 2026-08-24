@@ -95,13 +95,13 @@ export default function AppTabs({ initialQuestions, initialDrafts }: Props) {
 
   return (
     <div>
-      <div className="mb-4 flex gap-1 border-b border-neutral-200">
+      <div className="mb-4 flex gap-1 overflow-x-auto border-b border-neutral-200">
         {TABS.map((tab) => (
           <button
             key={tab.id}
             type="button"
             onClick={() => setActiveTab(tab.id)}
-            className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium transition ${
+            className={`-mb-px shrink-0 whitespace-nowrap border-b-2 px-2.5 py-2.5 text-sm font-medium transition ${
               activeTab === tab.id
                 ? "border-neutral-900 text-neutral-900"
                 : "border-transparent text-neutral-400 hover:text-neutral-600"
