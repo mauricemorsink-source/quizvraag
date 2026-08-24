@@ -1,12 +1,14 @@
 import { prisma } from "@/lib/prisma";
-import QuestionList from "@/components/QuestionList";
+import AppTabs from "@/components/AppTabs";
 import LogoutButton from "@/components/LogoutButton";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const questions = await prisma.question.findMany({ orderBy: { createdAt: "desc" } });
-  const categories = Array.from(new Set(questions.map((q) => q.category))).sort();
+  const [questions, drafts] = await Promise.all([
+    prisma.question.findMany({ orderBy: { createdAt: "desc" } }),
+    prisma.draft.findMany({ orderBy: { createdAt: "desc" } }),
+  ]);
 
   return (
     <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-8">
@@ -18,9 +20,9 @@ export default async function Home() {
         <LogoutButton />
       </header>
 
-      <QuestionList
+      <AppTabs
         initialQuestions={JSON.parse(JSON.stringify(questions))}
-        initialCategories={categories}
+        initialDrafts={JSON.parse(JSON.stringify(drafts))}
       />
     </main>
   );

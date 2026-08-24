@@ -9,3 +9,11 @@ export type Question = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type Draft = {
+  id: string;
+  text: string;
+  category: string;
+  createdAt: string;
+  updatedAt: string;
+};

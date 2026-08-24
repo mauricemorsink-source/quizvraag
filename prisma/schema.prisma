@@ -19,3 +19,13 @@ model Question {
 
   @@index([category])
 }
+
+model Draft {
+  id        String   @id @default(cuid())
+  text      String
+  category  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+}
