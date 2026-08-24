@@ -95,21 +95,25 @@ export default function AppTabs({ initialQuestions, initialDrafts }: Props) {
 
   return (
     <div>
-      <div className="mb-4 flex gap-1 overflow-x-auto border-b border-neutral-200">
+      <div className="no-scrollbar mb-5 flex gap-1 overflow-x-auto rounded-xl border border-neutral-200 bg-white p-1 shadow-sm">
         {TABS.map((tab) => (
           <button
             key={tab.id}
             type="button"
             onClick={() => setActiveTab(tab.id)}
-            className={`-mb-px shrink-0 whitespace-nowrap border-b-2 px-2.5 py-2.5 text-sm font-medium transition ${
+            className={`shrink-0 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition ${
               activeTab === tab.id
-                ? "border-neutral-900 text-neutral-900"
-                : "border-transparent text-neutral-400 hover:text-neutral-600"
+                ? "bg-indigo-600 text-white shadow-sm"
+                : "text-neutral-500 hover:bg-neutral-50 hover:text-neutral-800"
             }`}
           >
             {tab.label}
             {tab.id === "kladblok" && drafts.length > 0 && (
-              <span className="ml-1.5 rounded-full bg-neutral-100 px-1.5 py-0.5 text-xs text-neutral-500">
+              <span
+                className={`ml-1.5 rounded-full px-1.5 py-0.5 text-xs ${
+                  activeTab === tab.id ? "bg-white/20 text-white" : "bg-amber-100 text-amber-700"
+                }`}
+              >
                 {drafts.length}
               </span>
             )}

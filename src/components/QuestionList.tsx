@@ -13,6 +13,9 @@ type Props = {
 
 type UsedFilter = "all" | "used" | "unused";
 
+const selectClass =
+  "rounded-lg border border-neutral-300 bg-white px-2.5 py-2 text-sm text-neutral-700 transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100";
+
 export default function QuestionList({ questions, categories, onUpdate, onDelete }: Props) {
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [usedFilter, setUsedFilter] = useState<UsedFilter>("all");
@@ -33,12 +36,8 @@ export default function QuestionList({ questions, categories, onUpdate, onDelete
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <select
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-          className="rounded-md border border-neutral-300 px-2.5 py-2 text-sm"
-        >
+      <div className="flex flex-wrap items-center gap-2 rounded-xl border border-neutral-200 bg-white p-3 shadow-sm">
+        <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} className={selectClass}>
           <option value="all">Alle categorieën</option>
           {categories.map((c) => (
             <option key={c} value={c}>
@@ -47,11 +46,7 @@ export default function QuestionList({ questions, categories, onUpdate, onDelete
           ))}
         </select>
 
-        <select
-          value={usedFilter}
-          onChange={(e) => setUsedFilter(e.target.value as UsedFilter)}
-          className="rounded-md border border-neutral-300 px-2.5 py-2 text-sm"
-        >
+        <select value={usedFilter} onChange={(e) => setUsedFilter(e.target.value as UsedFilter)} className={selectClass}>
           <option value="all">Alles</option>
           <option value="unused">Nog niet gebruikt</option>
           <option value="used">Al gebruikt</option>
@@ -62,28 +57,22 @@ export default function QuestionList({ questions, categories, onUpdate, onDelete
           placeholder="Zoeken…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="min-w-[10rem] flex-1 rounded-md border border-neutral-300 px-2.5 py-2 text-sm"
+          className="min-w-[10rem] flex-1 rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
         />
       </div>
 
-      <p className="text-xs text-neutral-400">
+      <p className="px-1 text-xs text-neutral-400">
         {filtered.length} van {questions.length} vragen
       </p>
 
       {filtered.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-neutral-300 p-6 text-center text-sm text-neutral-400">
-          Geen vragen gevonden.
-        </p>
+        <div className="rounded-xl border border-dashed border-neutral-300 bg-white/50 p-8 text-center">
+          <p className="text-sm text-neutral-400">Geen vragen gevonden.</p>
+        </div>
       ) : (
-        <ul className="space-y-2">
+        <ul className="space-y-2.5">
           {filtered.map((q) => (
-            <QuestionRow
-              key={q.id}
-              question={q}
-              categories={categories}
-              onUpdate={onUpdate}
-              onDelete={onDelete}
-            />
+            <QuestionRow key={q.id} question={q} categories={categories} onUpdate={onUpdate} onDelete={onDelete} />
           ))}
         </ul>
       )}

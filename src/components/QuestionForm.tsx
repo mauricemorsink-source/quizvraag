@@ -11,6 +11,9 @@ type Props = {
   onCancel?: () => void;
 };
 
+const fieldClass =
+  "w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100";
+
 export default function QuestionForm({ categories, initial, submitLabel, onSubmit, onCancel }: Props) {
   const [question, setQuestion] = useState(initial?.question ?? "");
   const [answer, setAnswer] = useState(initial?.answer ?? "");
@@ -43,35 +46,20 @@ export default function QuestionForm({ categories, initial, submitLabel, onSubmi
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-lg border border-neutral-200 bg-white p-4">
-      <div className="mb-3">
-        <label className="mb-1 block text-sm font-medium text-neutral-700">Vraag</label>
-        <textarea
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          rows={2}
-          className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-500 focus:outline-none"
-        />
+    <form onSubmit={handleSubmit} className="animate-fade-in rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+      <div className="mb-3.5">
+        <label className="mb-1.5 block text-sm font-medium text-neutral-700">Vraag</label>
+        <textarea value={question} onChange={(e) => setQuestion(e.target.value)} rows={2} className={fieldClass} />
       </div>
 
-      <div className="mb-3">
-        <label className="mb-1 block text-sm font-medium text-neutral-700">Antwoord</label>
-        <textarea
-          value={answer}
-          onChange={(e) => setAnswer(e.target.value)}
-          rows={2}
-          className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-500 focus:outline-none"
-        />
+      <div className="mb-3.5">
+        <label className="mb-1.5 block text-sm font-medium text-neutral-700">Antwoord</label>
+        <textarea value={answer} onChange={(e) => setAnswer(e.target.value)} rows={2} className={fieldClass} />
       </div>
 
-      <div className="mb-3">
-        <label className="mb-1 block text-sm font-medium text-neutral-700">Categorie</label>
-        <input
-          list="category-suggestions"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-500 focus:outline-none"
-        />
+      <div className="mb-3.5">
+        <label className="mb-1.5 block text-sm font-medium text-neutral-700">Categorie</label>
+        <input list="category-suggestions" value={category} onChange={(e) => setCategory(e.target.value)} className={fieldClass} />
         <datalist id="category-suggestions">
           {categories.map((c) => (
             <option key={c} value={c} />
@@ -80,21 +68,19 @@ export default function QuestionForm({ categories, initial, submitLabel, onSubmi
       </div>
 
       <div className="mb-4">
-        <label className="mb-1 block text-sm font-medium text-neutral-700">Notities (optioneel)</label>
-        <input
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-500 focus:outline-none"
-        />
+        <label className="mb-1.5 block text-sm font-medium text-neutral-700">Notities (optioneel)</label>
+        <input value={notes} onChange={(e) => setNotes(e.target.value)} className={fieldClass} />
       </div>
 
-      {error && <p className="mb-3 text-sm text-red-600">{error}</p>}
+      {error && (
+        <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
+      )}
 
-      <div className="flex gap-2">
+      <div className="flex gap-2 pt-1">
         <button
           type="submit"
           disabled={saving}
-          className="rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white transition hover:bg-neutral-700 disabled:opacity-50"
+          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-50"
         >
           {saving ? "Bezig…" : submitLabel}
         </button>
@@ -102,7 +88,7 @@ export default function QuestionForm({ categories, initial, submitLabel, onSubmi
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-md border border-neutral-300 px-3 py-2 text-sm text-neutral-600 transition hover:bg-neutral-100"
+            className="rounded-lg border border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-600 transition hover:bg-neutral-50"
           >
             Annuleren
           </button>

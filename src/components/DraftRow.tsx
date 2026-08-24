@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { Draft } from "@/lib/types";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 type Props = {
   draft: Draft;
@@ -11,35 +12,44 @@ type Props = {
 
 export default function DraftRow({ draft, onConvert, onDelete }: Props) {
   const [deleting, setDeleting] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   return (
-    <li className="rounded-lg border border-neutral-200 bg-white p-4">
-      <span className="mb-1 inline-block rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-600">
+    <li className="animate-fade-in rounded-xl border border-neutral-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
+      <span className="mb-1.5 inline-block rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
         {draft.category}
       </span>
-      <p className="whitespace-pre-wrap text-sm text-neutral-900">{draft.text}</p>
+      <p className="whitespace-pre-wrap text-[0.95rem] leading-snug text-neutral-900">{draft.text}</p>
 
       <div className="mt-3 flex flex-wrap gap-2 border-t border-neutral-100 pt-3">
         <button
           type="button"
           onClick={() => onConvert(draft)}
-          className="rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white transition hover:bg-neutral-700"
+          className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
         >
           Omzetten naar vraag
         </button>
         <button
           type="button"
           disabled={deleting}
-          onClick={async () => {
-            if (!confirm("Dit kladje verwijderen?")) return;
-            setDeleting(true);
-            await onDelete(draft.id);
-          }}
-          className="rounded-md border border-red-200 px-3 py-2 text-sm text-red-600 transition hover:bg-red-50 disabled:opacity-50"
+          onClick={() => setConfirmOpen(true)}
+          className="rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50"
         >
           Verwijderen
         </button>
       </div>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Kladje verwijderen"
+        message="Weet je zeker dat je dit kladje wilt verwijderen? Dit kan niet ongedaan worden gemaakt."
+        onCancel={() => setConfirmOpen(false)}
+        onConfirm={async () => {
+          setConfirmOpen(false);
+          setDeleting(true);
+          await onDelete(draft.id);
+        }}
+      />
     </li>
   );
 }
