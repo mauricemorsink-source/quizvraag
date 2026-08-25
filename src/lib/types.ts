@@ -17,3 +17,26 @@ export type Draft = {
   createdAt: string;
   updatedAt: string;
 };
+
+export const ROUND_TYPES = ["MUZIEKRONDE", "PLAATJESRONDE", "INTRORONDE", "OVERIGE"] as const;
+export type RoundType = (typeof ROUND_TYPES)[number];
+
+export function isRoundType(value: unknown): value is RoundType {
+  return typeof value === "string" && (ROUND_TYPES as readonly string[]).includes(value);
+}
+
+export const ROUND_TYPE_LABELS: Record<RoundType, string> = {
+  MUZIEKRONDE: "Muziekronde",
+  PLAATJESRONDE: "Plaatjesronde",
+  INTRORONDE: "Introronde",
+  OVERIGE: "Overige rondes",
+};
+
+export type RoundIdea = {
+  id: string;
+  title: string;
+  note: string | null;
+  roundType: RoundType;
+  createdAt: string;
+  updatedAt: string;
+};

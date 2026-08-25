@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { Draft } from "@/lib/types";
 import DraftRow from "@/components/DraftRow";
+import CategorySelect from "@/components/CategorySelect";
 
 type Props = {
   drafts: Draft[];
@@ -20,6 +21,7 @@ export default function KladblokPanel({ drafts, categories, onAdd, onDelete, onC
   const [category, setCategory] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [formKey, setFormKey] = useState(0);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -33,6 +35,7 @@ export default function KladblokPanel({ drafts, categories, onAdd, onDelete, onC
       await onAdd({ text: text.trim(), category: category.trim() });
       setText("");
       setCategory("");
+      setFormKey((k) => k + 1);
     } catch {
       setError("Opslaan mislukt, probeer het opnieuw");
     } finally {
@@ -55,12 +58,7 @@ export default function KladblokPanel({ drafts, categories, onAdd, onDelete, onC
         </div>
         <div className="mb-4">
           <label className="mb-1.5 block text-sm font-medium text-neutral-700">Categorie</label>
-          <input list="draft-category-suggestions" value={category} onChange={(e) => setCategory(e.target.value)} className={fieldClass} />
-          <datalist id="draft-category-suggestions">
-            {categories.map((c) => (
-              <option key={c} value={c} />
-            ))}
-          </datalist>
+          <CategorySelect key={formKey} categories={categories} value={category} onChange={setCategory} />
         </div>
 
         {error && <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}

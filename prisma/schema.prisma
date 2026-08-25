@@ -29,3 +29,21 @@ model Draft {
 
   @@index([category])
 }
+
+enum RoundType {
+  MUZIEKRONDE
+  PLAATJESRONDE
+  INTRORONDE
+  OVERIGE
+}
+
+model RoundIdea {
+  id        String    @id @default(cuid())
+  title     String
+  note      String?
+  roundType RoundType
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([roundType])
+}

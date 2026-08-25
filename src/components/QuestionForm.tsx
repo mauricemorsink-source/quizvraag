@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { Question } from "@/lib/types";
+import CategorySelect from "@/components/CategorySelect";
 
 type Props = {
   categories: string[];
@@ -21,6 +22,7 @@ export default function QuestionForm({ categories, initial, submitLabel, onSubmi
   const [notes, setNotes] = useState(initial?.notes ?? "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [formKey, setFormKey] = useState(0);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -37,6 +39,7 @@ export default function QuestionForm({ categories, initial, submitLabel, onSubmi
         setAnswer("");
         setCategory("");
         setNotes("");
+        setFormKey((k) => k + 1);
       }
     } catch {
       setError("Opslaan mislukt, probeer het opnieuw");
@@ -59,12 +62,7 @@ export default function QuestionForm({ categories, initial, submitLabel, onSubmi
 
       <div className="mb-3.5">
         <label className="mb-1.5 block text-sm font-medium text-neutral-700">Categorie</label>
-        <input list="category-suggestions" value={category} onChange={(e) => setCategory(e.target.value)} className={fieldClass} />
-        <datalist id="category-suggestions">
-          {categories.map((c) => (
-            <option key={c} value={c} />
-          ))}
-        </datalist>
+        <CategorySelect key={formKey} categories={categories} value={category} onChange={setCategory} />
       </div>
 
       <div className="mb-4">

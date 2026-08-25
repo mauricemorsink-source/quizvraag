@@ -1,28 +1,32 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { Question, Draft } from "@/lib/types";
+import type { Question, Draft, RoundIdea, RoundType } from "@/lib/types";
 import KladblokPanel from "@/components/KladblokPanel";
 import QuestionCreatePanel from "@/components/QuestionCreatePanel";
 import QuestionList from "@/components/QuestionList";
+import RoundIdeasPanel from "@/components/RoundIdeasPanel";
 
 type Props = {
   initialQuestions: Question[];
   initialDrafts: Draft[];
+  initialRoundIdeas: RoundIdea[];
 };
 
-type Tab = "kladblok" | "nieuwe-vraag" | "overzicht";
+type Tab = "kladblok" | "nieuwe-vraag" | "overzicht" | "rondes";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "kladblok", label: "Kladblok" },
   { id: "nieuwe-vraag", label: "Quizvraag maken" },
   { id: "overzicht", label: "Overzicht" },
+  { id: "rondes", label: "Rondes" },
 ];
 
-export default function AppTabs({ initialQuestions, initialDrafts }: Props) {
+export default function AppTabs({ initialQuestions, initialDrafts, initialRoundIdeas }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>("overzicht");
   const [questions, setQuestions] = useState<Question[]>(initialQuestions);
   const [drafts, setDrafts] = useState<Draft[]>(initialDrafts);
+  const [roundIdeas, setRoundIdeas] = useState<RoundIdea[]>(initialRoundIdeas);
   const [conversionDraft, setConversionDraft] = useState<Draft | null>(null);
 
   const categories = useMemo(
@@ -93,6 +97,36 @@ export default function AppTabs({ initialQuestions, initialDrafts }: Props) {
     setActiveTab("nieuwe-vraag");
   }
 
+  // --- Ronde-ideeën ---
+
+  async function addRoundIdea(data: { title: string; note: string; roundType: RoundType }) {
+    const res = await fetch("/api/round-ideas", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error("Opslaan mislukt");
+    const created: RoundIdea = await res.json();
+    setRoundIdeas((prev) => [created, ...prev]);
+  }
+
+  async function updateRoundIdea(id: string, data: { title: string; note: string; roundType: RoundType }) {
+    const res = await fetch(`/api/round-ideas/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error("Bijwerken mislukt");
+    const updated: RoundIdea = await res.json();
+    setRoundIdeas((prev) => prev.map((i) => (i.id === id ? updated : i)));
+  }
+
+  async function deleteRoundIdea(id: string) {
+    const res = await fetch(`/api/round-ideas/${id}`, { method: "DELETE" });
+    if (!res.ok) throw new Error("Verwijderen mislukt");
+    setRoundIdeas((prev) => prev.filter((i) => i.id !== id));
+  }
+
   return (
     <div>
       <div className="no-scrollbar mb-5 flex gap-1 overflow-x-auto rounded-xl border border-neutral-200 bg-white p-1 shadow-sm">
@@ -146,6 +180,15 @@ export default function AppTabs({ initialQuestions, initialDrafts }: Props) {
           categories={categories}
           onUpdate={updateQuestion}
           onDelete={deleteQuestion}
+        />
+      )}
+
+      {activeTab === "rondes" && (
+        <RoundIdeasPanel
+          ideas={roundIdeas}
+          onAdd={addRoundIdea}
+          onUpdate={updateRoundIdea}
+          onDelete={deleteRoundIdea}
         />
       )}
     </div>

@@ -4,9 +4,10 @@ import AppTabs from "@/components/AppTabs";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [questions, drafts] = await Promise.all([
+  const [questions, drafts, roundIdeas] = await Promise.all([
     prisma.question.findMany({ orderBy: { createdAt: "desc" } }),
     prisma.draft.findMany({ orderBy: { createdAt: "desc" } }),
+    prisma.roundIdea.findMany({ orderBy: { createdAt: "desc" } }),
   ]);
 
   return (
@@ -24,6 +25,7 @@ export default async function Home() {
       <AppTabs
         initialQuestions={JSON.parse(JSON.stringify(questions))}
         initialDrafts={JSON.parse(JSON.stringify(drafts))}
+        initialRoundIdeas={JSON.parse(JSON.stringify(roundIdeas))}
       />
     </main>
   );
