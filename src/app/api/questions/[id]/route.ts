@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { normalizeCategories } from "@/lib/categories";
 
 export async function PATCH(
   req: NextRequest,
@@ -14,7 +15,7 @@ export async function PATCH(
   const data: {
     question?: string;
     answer?: string;
-    category?: string;
+    categories?: string[];
     notes?: string | null;
     used?: boolean;
     usedAt?: Date | null;
@@ -22,7 +23,10 @@ export async function PATCH(
 
   if (typeof body.question === "string") data.question = body.question.trim();
   if (typeof body.answer === "string") data.answer = body.answer.trim();
-  if (typeof body.category === "string") data.category = body.category.trim();
+  if (Array.isArray(body.categories)) {
+    const categories = normalizeCategories(body.categories);
+    if (categories.length > 0) data.categories = categories;
+  }
   if (typeof body.notes === "string") data.notes = body.notes.trim() || null;
 
   if (typeof body.used === "boolean") {

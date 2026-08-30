@@ -7,7 +7,7 @@ type Props = {
   categories: string[];
   conversionDraft: Draft | null;
   onCancelConversion: () => void;
-  onSubmit: (data: { question: string; answer: string; category: string; notes: string }) => Promise<void>;
+  onSubmit: (data: { question: string; answer: string; categories: string[]; notes: string }) => Promise<void>;
 };
 
 export default function QuestionCreatePanel({
@@ -39,7 +39,7 @@ export default function QuestionCreatePanel({
         categories={categories}
         initial={
           conversionDraft
-            ? { question: conversionDraft.text, answer: "", category: conversionDraft.category, notes: null }
+            ? { question: conversionDraft.text, answer: "", categories: [conversionDraft.category], notes: null }
             : undefined
         }
         submitLabel="Vraag opslaan"

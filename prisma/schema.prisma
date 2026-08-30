@@ -7,17 +7,17 @@ datasource db {
 }
 
 model Question {
-  id        String    @id @default(cuid())
-  question  String
-  answer    String
-  category  String
-  notes     String?
-  used      Boolean   @default(false)
-  usedAt    DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id         String    @id @default(cuid())
+  question   String
+  answer     String
+  categories String[]  @default([])
+  notes      String?
+  used       Boolean   @default(false)
+  usedAt     DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
-  @@index([category])
+  @@index([categories])
 }
 
 model Draft {

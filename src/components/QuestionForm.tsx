@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import type { Question } from "@/lib/types";
-import CategorySelect from "@/components/CategorySelect";
+import CategoryMultiSelect from "@/components/CategoryMultiSelect";
 
 type Props = {
   categories: string[];
-  initial?: Pick<Question, "question" | "answer" | "category" | "notes">;
+  initial?: Pick<Question, "question" | "answer" | "categories" | "notes">;
   submitLabel: string;
-  onSubmit: (data: { question: string; answer: string; category: string; notes: string }) => Promise<void>;
+  onSubmit: (data: { question: string; answer: string; categories: string[]; notes: string }) => Promise<void>;
   onCancel?: () => void;
 };
 
@@ -18,28 +18,31 @@ const fieldClass =
 export default function QuestionForm({ categories, initial, submitLabel, onSubmit, onCancel }: Props) {
   const [question, setQuestion] = useState(initial?.question ?? "");
   const [answer, setAnswer] = useState(initial?.answer ?? "");
-  const [category, setCategory] = useState(initial?.category ?? "");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(initial?.categories ?? []);
   const [notes, setNotes] = useState(initial?.notes ?? "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [formKey, setFormKey] = useState(0);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!question.trim() || !answer.trim() || !category.trim()) {
-      setError("Vraag, antwoord en categorie zijn verplicht");
+    if (!question.trim() || !answer.trim() || selectedCategories.length === 0) {
+      setError("Vraag, antwoord en minstens één categorie zijn verplicht");
       return;
     }
     setError(null);
     setSaving(true);
     try {
-      await onSubmit({ question: question.trim(), answer: answer.trim(), category: category.trim(), notes: notes.trim() });
+      await onSubmit({
+        question: question.trim(),
+        answer: answer.trim(),
+        categories: selectedCategories,
+        notes: notes.trim(),
+      });
       if (!initial) {
         setQuestion("");
         setAnswer("");
-        setCategory("");
+        setSelectedCategories([]);
         setNotes("");
-        setFormKey((k) => k + 1);
       }
     } catch {
       setError("Opslaan mislukt, probeer het opnieuw");
@@ -61,8 +64,8 @@ export default function QuestionForm({ categories, initial, submitLabel, onSubmi
       </div>
 
       <div className="mb-3.5">
-        <label className="mb-1.5 block text-sm font-medium text-neutral-700">Categorie</label>
-        <CategorySelect key={formKey} categories={categories} value={category} onChange={setCategory} />
+        <label className="mb-1.5 block text-sm font-medium text-neutral-700">Categorieën</label>
+        <CategoryMultiSelect categories={categories} value={selectedCategories} onChange={setSelectedCategories} />
       </div>
 
       <div className="mb-4">

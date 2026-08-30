@@ -38,9 +38,11 @@ export default function QuestionRow({ question, categories, onUpdate, onDelete }
   return (
     <li className="animate-fade-in rounded-xl border border-neutral-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
       <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
-        <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700">
-          {question.category}
-        </span>
+        {question.categories.map((c) => (
+          <span key={c} className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700">
+            {c}
+          </span>
+        ))}
         {question.used && (
           <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
             Gebruikt

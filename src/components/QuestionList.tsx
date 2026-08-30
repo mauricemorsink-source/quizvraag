@@ -24,7 +24,7 @@ export default function QuestionList({ questions, categories, onUpdate, onDelete
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
     return questions.filter((q) => {
-      if (categoryFilter !== "all" && q.category !== categoryFilter) return false;
+      if (categoryFilter !== "all" && !q.categories.includes(categoryFilter)) return false;
       if (usedFilter === "used" && !q.used) return false;
       if (usedFilter === "unused" && q.used) return false;
       if (term && !q.question.toLowerCase().includes(term) && !q.answer.toLowerCase().includes(term)) {

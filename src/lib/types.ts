@@ -2,7 +2,7 @@ export type Question = {
   id: string;
   question: string;
   answer: string;
-  category: string;
+  categories: string[];
   notes: string | null;
   used: boolean;
   usedAt: string | null;

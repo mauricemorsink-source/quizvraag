@@ -32,14 +32,14 @@ export default function AppTabs({ initialQuestions, initialDrafts, initialRoundI
   const categories = useMemo(
     () =>
       Array.from(
-        new Set([...questions.map((q) => q.category), ...drafts.map((d) => d.category)])
+        new Set([...questions.flatMap((q) => q.categories), ...drafts.map((d) => d.category)])
       ).sort(),
     [questions, drafts]
   );
 
   // --- Vragen ---
 
-  async function addQuestion(data: { question: string; answer: string; category: string; notes: string }) {
+  async function addQuestion(data: { question: string; answer: string; categories: string[]; notes: string }) {
     const res = await fetch("/api/questions", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
