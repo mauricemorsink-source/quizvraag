@@ -135,7 +135,7 @@ export default function BulkImportPanel({ categories, onImport }: Props) {
       {parsed && (
         <div className="mt-4 border-t border-neutral-100 pt-4">
           <p className="mb-2 text-xs text-neutral-400">
-            {parsed.length} vraag{parsed.length === 1 ? "" : "en"} herkend
+            {parsed.length} {parsed.length === 1 ? "vraag" : "vragen"} herkend
             {skipped > 0 ? ` · ${skipped} regel${skipped === 1 ? "" : "s"} overgeslagen (niet herkend)` : ""}
           </p>
           <ul className="max-h-80 space-y-1.5 overflow-y-auto">

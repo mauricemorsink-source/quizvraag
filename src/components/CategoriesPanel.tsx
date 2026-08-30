@@ -91,7 +91,7 @@ function CategoryRow({ stat, onRename, onDelete }: { stat: CategoryStat } & Omit
         <div>
           <span className="font-medium text-neutral-900">{stat.name}</span>
           <span className="ml-2 text-xs text-neutral-400">
-            {stat.questionCount} vraag{stat.questionCount === 1 ? "" : "en"}
+            {stat.questionCount} {stat.questionCount === 1 ? "vraag" : "vragen"}
             {stat.draftCount > 0 ? ` · ${stat.draftCount} kladje(s)` : ""}
           </span>
         </div>
