@@ -1,13 +1,16 @@
 "use client";
 
-import type { Draft } from "@/lib/types";
+import { useState } from "react";
+import type { Draft, Question } from "@/lib/types";
 import QuestionForm from "@/components/QuestionForm";
+import BulkImportPanel from "@/components/BulkImportPanel";
 
 type Props = {
   categories: string[];
   conversionDraft: Draft | null;
   onCancelConversion: () => void;
   onSubmit: (data: { question: string; answer: string; categories: string[]; notes: string }) => Promise<void>;
+  onBulkImport: (items: { question: string; answer: string; categories: string[] }[]) => Promise<Question[]>;
 };
 
 export default function QuestionCreatePanel({
@@ -15,7 +18,10 @@ export default function QuestionCreatePanel({
   conversionDraft,
   onCancelConversion,
   onSubmit,
+  onBulkImport,
 }: Props) {
+  const [mode, setMode] = useState<"single" | "bulk">("single");
+
   return (
     <div className="space-y-4">
       {conversionDraft && (
@@ -34,17 +40,44 @@ export default function QuestionCreatePanel({
         </div>
       )}
 
-      <QuestionForm
-        key={conversionDraft?.id ?? "new"}
-        categories={categories}
-        initial={
-          conversionDraft
-            ? { question: conversionDraft.text, answer: "", categories: [conversionDraft.category], notes: null }
-            : undefined
-        }
-        submitLabel="Vraag opslaan"
-        onSubmit={onSubmit}
-      />
+      {!conversionDraft && (
+        <div className="flex gap-1 text-sm">
+          <button
+            type="button"
+            onClick={() => setMode("single")}
+            className={`rounded-lg px-3 py-1.5 font-medium transition ${
+              mode === "single" ? "bg-neutral-900 text-white" : "text-neutral-500 hover:bg-neutral-100"
+            }`}
+          >
+            Eén vraag
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("bulk")}
+            className={`rounded-lg px-3 py-1.5 font-medium transition ${
+              mode === "bulk" ? "bg-neutral-900 text-white" : "text-neutral-500 hover:bg-neutral-100"
+            }`}
+          >
+            Meerdere plakken
+          </button>
+        </div>
+      )}
+
+      {mode === "single" || conversionDraft ? (
+        <QuestionForm
+          key={conversionDraft?.id ?? "new"}
+          categories={categories}
+          initial={
+            conversionDraft
+              ? { question: conversionDraft.text, answer: "", categories: [conversionDraft.category], notes: null }
+              : undefined
+          }
+          submitLabel="Vraag opslaan"
+          onSubmit={onSubmit}
+        />
+      ) : (
+        <BulkImportPanel categories={categories} onImport={onBulkImport} />
+      )}
     </div>
   );
 }

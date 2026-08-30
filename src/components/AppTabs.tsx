@@ -6,6 +6,7 @@ import KladblokPanel from "@/components/KladblokPanel";
 import QuestionCreatePanel from "@/components/QuestionCreatePanel";
 import QuestionList from "@/components/QuestionList";
 import RoundIdeasPanel from "@/components/RoundIdeasPanel";
+import CategoriesPanel, { type CategoryStat } from "@/components/CategoriesPanel";
 
 type Props = {
   initialQuestions: Question[];
@@ -13,13 +14,14 @@ type Props = {
   initialRoundIdeas: RoundIdea[];
 };
 
-type Tab = "kladblok" | "nieuwe-vraag" | "overzicht" | "rondes";
+type Tab = "kladblok" | "nieuwe-vraag" | "overzicht" | "rondes" | "categorieen";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "kladblok", label: "Kladblok" },
   { id: "nieuwe-vraag", label: "Quizvraag maken" },
   { id: "overzicht", label: "Overzicht" },
   { id: "rondes", label: "Rondes" },
+  { id: "categorieen", label: "Categorieën" },
 ];
 
 export default function AppTabs({ initialQuestions, initialDrafts, initialRoundIdeas }: Props) {
@@ -36,6 +38,14 @@ export default function AppTabs({ initialQuestions, initialDrafts, initialRoundI
       ).sort(),
     [questions, drafts]
   );
+
+  const categoryStats = useMemo<CategoryStat[]>(() => {
+    return categories.map((name) => ({
+      name,
+      questionCount: questions.filter((q) => q.categories.includes(name)).length,
+      draftCount: drafts.filter((d) => d.category === name).length,
+    }));
+  }, [categories, questions, drafts]);
 
   // --- Vragen ---
 
@@ -54,6 +64,18 @@ export default function AppTabs({ initialQuestions, initialDrafts, initialRoundI
       setConversionDraft(null);
       await deleteDraft(draftId);
     }
+  }
+
+  async function bulkAddQuestions(items: { question: string; answer: string; categories: string[] }[]) {
+    const res = await fetch("/api/questions/bulk", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items }),
+    });
+    if (!res.ok) throw new Error("Importeren mislukt");
+    const { created }: { created: Question[] } = await res.json();
+    setQuestions((prev) => [...created, ...prev]);
+    return created;
   }
 
   async function updateQuestion(id: string, data: Record<string, unknown>) {
@@ -127,6 +149,40 @@ export default function AppTabs({ initialQuestions, initialDrafts, initialRoundI
     setRoundIdeas((prev) => prev.filter((i) => i.id !== id));
   }
 
+  // --- Categorieën ---
+
+  async function renameCategory(from: string, to: string) {
+    const res = await fetch("/api/categories", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ from, to }),
+    });
+    if (!res.ok) throw new Error("Hernoemen mislukt");
+    setQuestions((prev) =>
+      prev.map((q) =>
+        q.categories.includes(from)
+          ? { ...q, categories: Array.from(new Set(q.categories.map((c) => (c === from ? to : c)))) }
+          : q
+      )
+    );
+    setDrafts((prev) => prev.map((d) => (d.category === from ? { ...d, category: to } : d)));
+  }
+
+  async function deleteCategory(name: string) {
+    const res = await fetch(`/api/categories/${encodeURIComponent(name)}`, { method: "DELETE" });
+    if (res.status === 409) {
+      const body = await res.json();
+      return { blocked: true, blockingQuestions: body.blockingQuestions, blockingDrafts: body.blockingDrafts };
+    }
+    if (!res.ok) throw new Error("Verwijderen mislukt");
+    setQuestions((prev) =>
+      prev.map((q) =>
+        q.categories.includes(name) ? { ...q, categories: q.categories.filter((c) => c !== name) } : q
+      )
+    );
+    return {};
+  }
+
   return (
     <div>
       <div className="no-scrollbar mb-5 flex gap-1 overflow-x-auto rounded-xl border border-neutral-200 bg-white p-1 shadow-sm">
@@ -171,6 +227,7 @@ export default function AppTabs({ initialQuestions, initialDrafts, initialRoundI
           conversionDraft={conversionDraft}
           onCancelConversion={() => setConversionDraft(null)}
           onSubmit={addQuestion}
+          onBulkImport={bulkAddQuestions}
         />
       )}
 
@@ -190,6 +247,10 @@ export default function AppTabs({ initialQuestions, initialDrafts, initialRoundI
           onUpdate={updateRoundIdea}
           onDelete={deleteRoundIdea}
         />
+      )}
+
+      {activeTab === "categorieen" && (
+        <CategoriesPanel stats={categoryStats} onRename={renameCategory} onDelete={deleteCategory} />
       )}
     </div>
   );
