@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Draft } from "@/lib/types";
 import DraftRow from "@/components/DraftRow";
 import CategorySelect from "@/components/CategorySelect";
@@ -16,6 +16,8 @@ type Props = {
 const fieldClass =
   "w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100";
 
+const LAST_CATEGORY_KEY = "quizvraag:laatste-kladblok-categorie";
+
 export default function KladblokPanel({ drafts, categories, onAdd, onDelete, onConvert }: Props) {
   const [text, setText] = useState("");
   const [category, setCategory] = useState("");
@@ -23,18 +25,29 @@ export default function KladblokPanel({ drafts, categories, onAdd, onDelete, onC
   const [error, setError] = useState<string | null>(null);
   const [formKey, setFormKey] = useState(0);
 
+  useEffect(() => {
+    const last = localStorage.getItem(LAST_CATEGORY_KEY);
+    if (last && categories.includes(last)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing from browser-only localStorage, not derivable during render
+      setCategory(last);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!text.trim() || !category.trim()) {
-      setError("Notitie en categorie zijn verplicht");
+    if (!text.trim()) {
+      setError("Notitie is verplicht");
       return;
     }
     setError(null);
     setSaving(true);
     try {
       await onAdd({ text: text.trim(), category: category.trim() });
+      if (category.trim()) {
+        localStorage.setItem(LAST_CATEGORY_KEY, category.trim());
+      }
       setText("");
-      setCategory("");
       setFormKey((k) => k + 1);
     } catch {
       setError("Opslaan mislukt, probeer het opnieuw");

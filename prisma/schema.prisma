@@ -23,7 +23,7 @@ model Question {
 model Draft {
   id        String   @id @default(cuid())
   text      String
-  category  String
+  category  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -37,11 +37,22 @@ enum RoundType {
   OVERIGE
 }
 
+model AiUsage {
+  id    String @id @default(cuid())
+  day   String @unique
+  count Int    @default(0)
+}
+
 model RoundIdea {
   id        String    @id @default(cuid())
   title     String
   note      String?
   roundType RoundType
+  // Plaatjesronde
+  imageUrl  String?
+  answer    String?
+  // Muziekronde
+  mediaUrl  String?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 

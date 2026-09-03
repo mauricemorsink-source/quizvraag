@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Question, Draft, RoundIdea, RoundType } from "@/lib/types";
 import KladblokPanel from "@/components/KladblokPanel";
 import QuestionCreatePanel from "@/components/QuestionCreatePanel";
@@ -24,17 +24,35 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "categorieen", label: "Categorieën" },
 ];
 
+const ACTIVE_TAB_KEY = "quizvraag:actieve-tab";
+
 export default function AppTabs({ initialQuestions, initialDrafts, initialRoundIdeas }: Props) {
-  const [activeTab, setActiveTab] = useState<Tab>("overzicht");
+  const [activeTab, setActiveTabState] = useState<Tab>("kladblok");
   const [questions, setQuestions] = useState<Question[]>(initialQuestions);
   const [drafts, setDrafts] = useState<Draft[]>(initialDrafts);
   const [roundIdeas, setRoundIdeas] = useState<RoundIdea[]>(initialRoundIdeas);
   const [conversionDraft, setConversionDraft] = useState<Draft | null>(null);
 
+  useEffect(() => {
+    const stored = sessionStorage.getItem(ACTIVE_TAB_KEY);
+    if (stored && TABS.some((t) => t.id === stored)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing from browser-only sessionStorage, not derivable during render
+      setActiveTabState(stored as Tab);
+    }
+  }, []);
+
+  function setActiveTab(tab: Tab) {
+    setActiveTabState(tab);
+    sessionStorage.setItem(ACTIVE_TAB_KEY, tab);
+  }
+
   const categories = useMemo(
     () =>
       Array.from(
-        new Set([...questions.flatMap((q) => q.categories), ...drafts.map((d) => d.category)])
+        new Set([
+          ...questions.flatMap((q) => q.categories),
+          ...drafts.flatMap((d) => (d.category ? [d.category] : [])),
+        ])
       ).sort(),
     [questions, drafts]
   );
@@ -121,7 +139,14 @@ export default function AppTabs({ initialQuestions, initialDrafts, initialRoundI
 
   // --- Ronde-ideeën ---
 
-  async function addRoundIdea(data: { title: string; note: string; roundType: RoundType }) {
+  async function addRoundIdea(data: {
+    title: string;
+    note: string;
+    roundType: RoundType;
+    imageUrl: string;
+    answer: string;
+    mediaUrl: string;
+  }) {
     const res = await fetch("/api/round-ideas", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -132,7 +157,10 @@ export default function AppTabs({ initialQuestions, initialDrafts, initialRoundI
     setRoundIdeas((prev) => [created, ...prev]);
   }
 
-  async function updateRoundIdea(id: string, data: { title: string; note: string; roundType: RoundType }) {
+  async function updateRoundIdea(
+    id: string,
+    data: { title: string; note: string; roundType: RoundType; imageUrl: string; answer: string; mediaUrl: string }
+  ) {
     const res = await fetch(`/api/round-ideas/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },

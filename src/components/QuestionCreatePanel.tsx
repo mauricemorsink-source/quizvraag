@@ -27,8 +27,14 @@ export default function QuestionCreatePanel({
       {conversionDraft && (
         <div className="animate-fade-in flex items-center justify-between rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 shadow-sm">
           <span>
-            Kladje wordt omgezet — categorie <strong>{conversionDraft.category}</strong> is al ingevuld. Na
-            opslaan wordt het kladje verwijderd.
+            Kladje wordt omgezet
+            {conversionDraft.category ? (
+              <>
+                {" "}
+                — categorie <strong>{conversionDraft.category}</strong> is al ingevuld
+              </>
+            ) : null}
+            . Na opslaan wordt het kladje verwijderd.
           </span>
           <button
             type="button"
@@ -69,11 +75,17 @@ export default function QuestionCreatePanel({
           categories={categories}
           initial={
             conversionDraft
-              ? { question: conversionDraft.text, answer: "", categories: [conversionDraft.category], notes: null }
+              ? {
+                  question: conversionDraft.text,
+                  answer: "",
+                  categories: conversionDraft.category ? [conversionDraft.category] : [],
+                  notes: null,
+                }
               : undefined
           }
           submitLabel="Vraag opslaan"
           onSubmit={onSubmit}
+          aiAssist={!!conversionDraft}
         />
       ) : (
         <BulkImportPanel categories={categories} onImport={onBulkImport} />

@@ -5,10 +5,19 @@ import { ROUND_TYPES, ROUND_TYPE_LABELS, type RoundIdea, type RoundType } from "
 import RoundIdeaForm from "@/components/RoundIdeaForm";
 import RoundIdeaRow from "@/components/RoundIdeaRow";
 
+type RoundIdeaInput = {
+  title: string;
+  note: string;
+  roundType: RoundType;
+  imageUrl: string;
+  answer: string;
+  mediaUrl: string;
+};
+
 type Props = {
   ideas: RoundIdea[];
-  onAdd: (data: { title: string; note: string; roundType: RoundType }) => Promise<void>;
-  onUpdate: (id: string, data: { title: string; note: string; roundType: RoundType }) => Promise<void>;
+  onAdd: (data: RoundIdeaInput) => Promise<void>;
+  onUpdate: (id: string, data: RoundIdeaInput) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
 };
 

@@ -55,9 +55,7 @@ export default function CategorySelect({ categories, value, onChange }: Props) {
       }}
       className={fieldClass}
     >
-      <option value="" disabled>
-        Kies een categorie…
-      </option>
+      <option value="">Geen categorie</option>
       {categories.map((c) => (
         <option key={c} value={c}>
           {c}

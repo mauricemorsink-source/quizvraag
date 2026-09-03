@@ -16,8 +16,12 @@ export default function DraftRow({ draft, onConvert, onDelete }: Props) {
 
   return (
     <li className="animate-fade-in rounded-xl border border-neutral-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
-      <span className="mb-1.5 inline-block rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
-        {draft.category}
+      <span
+        className={`mb-1.5 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${
+          draft.category ? "bg-amber-50 text-amber-700" : "bg-neutral-100 text-neutral-400"
+        }`}
+      >
+        {draft.category ?? "Geen categorie"}
       </span>
       <p className="whitespace-pre-wrap text-[0.95rem] leading-snug text-neutral-900">{draft.text}</p>
 

@@ -12,12 +12,22 @@ export async function PATCH(
     return NextResponse.json({ error: "Ongeldige aanvraag" }, { status: 400 });
   }
 
-  const data: { title?: string; note?: string | null; roundType?: RoundType } = {};
+  const data: {
+    title?: string;
+    note?: string | null;
+    roundType?: RoundType;
+    imageUrl?: string | null;
+    answer?: string | null;
+    mediaUrl?: string | null;
+  } = {};
   if (typeof body.title === "string") data.title = body.title.trim();
   if (typeof body.note === "string") data.note = body.note.trim() || null;
   if (isRoundType(body.roundType)) {
     data.roundType = body.roundType;
   }
+  if (typeof body.imageUrl === "string") data.imageUrl = body.imageUrl.trim() || null;
+  if (typeof body.answer === "string") data.answer = body.answer.trim() || null;
+  if (typeof body.mediaUrl === "string") data.mediaUrl = body.mediaUrl.trim() || null;
 
   try {
     const updated = await prisma.roundIdea.update({ where: { id }, data });

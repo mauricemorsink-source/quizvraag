@@ -11,9 +11,9 @@ export async function PATCH(
     return NextResponse.json({ error: "Ongeldige aanvraag" }, { status: 400 });
   }
 
-  const data: { text?: string; category?: string } = {};
+  const data: { text?: string; category?: string | null } = {};
   if (typeof body.text === "string") data.text = body.text.trim();
-  if (typeof body.category === "string") data.category = body.category.trim();
+  if (typeof body.category === "string") data.category = body.category.trim() || null;
 
   try {
     const updated = await prisma.draft.update({ where: { id }, data });

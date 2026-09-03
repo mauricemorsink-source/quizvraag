@@ -13,7 +13,7 @@ export type Question = {
 export type Draft = {
   id: string;
   text: string;
-  category: string;
+  category: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -37,6 +37,9 @@ export type RoundIdea = {
   title: string;
   note: string | null;
   roundType: RoundType;
+  imageUrl: string | null;
+  answer: string | null;
+  mediaUrl: string | null;
   createdAt: string;
   updatedAt: string;
 };
