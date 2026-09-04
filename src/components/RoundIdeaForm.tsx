@@ -29,12 +29,11 @@ export default function RoundIdeaForm({ initial, submitLabel, onSubmit, onCancel
   const [mediaUrl, setMediaUrl] = useState(initial?.mediaUrl ?? "");
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  async function uploadFile(file: File) {
     setError(null);
     setUploading(true);
     try {
@@ -51,8 +50,74 @@ export default function RoundIdeaForm({ initial, submitLabel, onSubmit, onCancel
       setError("Upload mislukt, probeer het opnieuw");
     } finally {
       setUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
     }
+  }
+
+  async function uploadFromUrl(url: string) {
+    setError(null);
+    setUploading(true);
+    try {
+      const res = await fetch("/api/upload/round-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+      const body = await res.json();
+      if (!res.ok) {
+        setError(body?.error ?? "Ophalen van afbeelding mislukt");
+        return;
+      }
+      setImageUrl(body.url);
+    } catch {
+      setError("Ophalen van afbeelding mislukt, probeer het opnieuw");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await uploadFile(file);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  function handleDragOver(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    setDragActive(true);
+  }
+
+  function handleDragLeave(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    setDragActive(false);
+  }
+
+  async function handleDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    setDragActive(false);
+
+    const droppedFile = Array.from(e.dataTransfer.files).find((f) => f.type.startsWith("image/"));
+    if (droppedFile) {
+      await uploadFile(droppedFile);
+      return;
+    }
+
+    // Slepen vanaf een andere pagina levert meestal geen bestand, maar een URL
+    // (text/uri-list of een stukje HTML met een <img src>).
+    const uriList = e.dataTransfer.getData("text/uri-list");
+    const html = e.dataTransfer.getData("text/html");
+    const plain = e.dataTransfer.getData("text/plain");
+    const fromHtml = html.match(/<img[^>]+src=["']([^"']+)["']/i)?.[1];
+    const candidate = [uriList, fromHtml, plain]
+      .map((v) => v?.split("\n").find((l) => l.trim() && !l.trim().startsWith("#"))?.trim())
+      .find(Boolean);
+
+    if (candidate) {
+      await uploadFromUrl(candidate);
+      return;
+    }
+
+    setError("Geen afbeelding herkend in wat je hebt gesleept");
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -127,16 +192,28 @@ export default function RoundIdeaForm({ initial, submitLabel, onSubmit, onCancel
                 </button>
               </div>
             ) : (
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                disabled={uploading}
-                className="block w-full text-sm text-neutral-600 file:mr-3 file:rounded-lg file:border-0 file:bg-teal-600 file:px-3 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-teal-700"
-              />
+              <div
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                className={`rounded-lg border-2 border-dashed p-4 text-center transition ${
+                  dragActive ? "border-indigo-400 bg-indigo-50" : "border-neutral-300 bg-white"
+                }`}
+              >
+                <p className="mb-2 text-xs text-neutral-500">
+                  Sleep een afbeelding hierheen (ook vanaf een andere pagina), of kies een bestand:
+                </p>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  disabled={uploading}
+                  className="block w-full text-sm text-neutral-600 file:mr-3 file:rounded-lg file:border-0 file:bg-teal-600 file:px-3 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-teal-700"
+                />
+              </div>
             )}
-            {uploading && <p className="mt-1 text-xs text-neutral-400">Bezig met uploaden…</p>}
+            {uploading && <p className="mt-1 text-xs text-neutral-400">Bezig met ophalen…</p>}
           </div>
           <div>
             <label className="mb-1.5 block text-sm font-medium text-neutral-700">Antwoord</label>
