@@ -235,6 +235,15 @@ export default function AppTabs({ initialQuestions, initialDrafts, initialRoundI
                 {drafts.length}
               </span>
             )}
+            {tab.id === "overzicht" && questions.length > 0 && (
+              <span
+                className={`ml-1.5 rounded-full px-1.5 py-0.5 text-xs ${
+                  activeTab === tab.id ? "bg-white/20 text-white" : "bg-neutral-100 text-neutral-500"
+                }`}
+              >
+                {questions.length}
+              </span>
+            )}
           </button>
         ))}
       </div>
